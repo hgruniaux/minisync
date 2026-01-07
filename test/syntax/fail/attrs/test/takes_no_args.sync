@@ -1,0 +1,2 @@
+[@test(5)]
+let node f (x : int) = x

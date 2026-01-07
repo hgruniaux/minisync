@@ -1,0 +1,6 @@
+File "dummy.sync", line 1, characters 3-13:
+ 1 | [@deprecated("test", "test")]
+       ^^^^^^^^^^
+
+Error: The 'deprecated' attribute takes either no arguments or a single
+       string argument.

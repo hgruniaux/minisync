@@ -1,0 +1,15 @@
+(include_subdirs unqualified)
+
+(library
+ (name minisync)
+ (modules_without_implementation ast tast nast)
+ (libraries zarith ocamlgraph)
+ (inline_tests)
+ (preprocess
+  (pps ppx_inline_test)))
+
+(ocamllex
+ (modules lexer))
+
+(menhir
+ (modules parser))

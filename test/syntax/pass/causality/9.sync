@@ -1,0 +1,5 @@
+let node add a b = c where
+  c = a + b
+
+let node acc2 x = y where
+  rec y = 0 fby add x y

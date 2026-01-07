@@ -1,0 +1,6 @@
+File "dummy.sync", line 1, characters 11-45:
+ 1 | let f x = 4444444444444444444444444444444444
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error: Integer literal exceeds the range of representable integers of type
+       int.

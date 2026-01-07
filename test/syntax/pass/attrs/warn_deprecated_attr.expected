@@ -1,0 +1,10 @@
+File "dummy.sync", line 7, characters 14-15:
+ 7 | let test x = f true && g false
+                  ^
+
+Warning: Function 'f' is deprecated.
+File "dummy.sync", line 7, characters 24-25:
+ 7 | let test x = f true && g false
+                            ^
+
+Warning: Function 'g' is deprecated: sorry :(

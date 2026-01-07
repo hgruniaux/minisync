@@ -1,0 +1,6 @@
+let node g z = o where
+  o = z + 1
+
+let node composed x = (y,z) where
+  rec y = 1 fby (z + 1)
+  and z = g y

@@ -1,0 +1,10 @@
+let f x =
+  let a = 0 in
+  let b = 43 in
+  let c = 0x3f4 in
+  let d = 0X9aB4 in
+  let e = 0o45 in
+  let f = 0O2434 in
+  let g = 0b00101 in
+  let h = 0B0001000 in
+  x

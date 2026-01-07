@@ -1,0 +1,3 @@
+let node f (x : int) = x
+
+let node g x = f true

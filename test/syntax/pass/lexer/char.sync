@@ -1,0 +1,16 @@
+let f x =
+  let a1 = ' ' in
+  let a2 = 'f' in
+  let a3 = '\n' in
+  let a4 = '\r' in
+  let a5 = '\t' in
+  let a6 = '\b' in
+  let a7 = '\ ' in
+  let a8 = '\"' in
+  let a9 = '\'' in
+  let a10 = '\\' in
+  let a11 = '\xff' in
+  let a12 = '\xA9' in
+  let a13 = '\169' in
+  let a14 = '\o123' in
+  x

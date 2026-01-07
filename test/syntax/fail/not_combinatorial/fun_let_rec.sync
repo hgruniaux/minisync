@@ -1,0 +1,4 @@
+let f z =
+  let rec x = 6
+  and y = 3
+  in x

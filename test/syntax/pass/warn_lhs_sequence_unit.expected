@@ -1,0 +1,6 @@
+File "dummy.sync", line 1, characters 11-12:
+ 1 | let f x = 5; x
+               ^
+
+Warning: The left-hand side of a sequence should be of type unit, but it is
+         of type int.

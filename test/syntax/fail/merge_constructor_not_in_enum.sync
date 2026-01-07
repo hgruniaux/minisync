@@ -1,0 +1,5 @@
+type s0 = S0
+type s1 = S1
+
+let f (s : s0) =
+  merge s (S1 -> 0)

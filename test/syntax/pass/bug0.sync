@@ -1,0 +1,10 @@
+type state =
+  | S0
+  | S1
+  | S2
+
+let node g s y =
+  (merge y
+    (S0 -> true)
+    (S1 -> false)
+    (S2 -> false))

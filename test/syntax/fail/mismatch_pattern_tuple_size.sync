@@ -1,0 +1,3 @@
+let node f (s: (int, int)) =
+  let (a, b, c) = s in
+  0

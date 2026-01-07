@@ -1,0 +1,2 @@
+let node pre_test x = y where
+  rec y = 0 -> (pre y + x)

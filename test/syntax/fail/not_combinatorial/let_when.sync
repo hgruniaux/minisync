@@ -1,0 +1,2 @@
+type state = S0
+let y = true when S0(S0)

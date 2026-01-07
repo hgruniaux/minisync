@@ -1,0 +1,5 @@
+File "dummy.sync", line 1, characters 3-7:
+ 1 | [@test(5)]
+       ^^^^
+
+Error: The 'test' attribute requires no arguments.

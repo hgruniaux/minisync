@@ -1,0 +1,6 @@
+type mytype =
+  | A
+
+let f (s : mytype) =
+  if s then 0
+  else 0

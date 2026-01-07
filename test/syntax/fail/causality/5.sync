@@ -1,0 +1,4 @@
+let node f a b = (u,v,w) where
+  rec u = v + 1
+  and v = w + 1
+  and w = u + 1

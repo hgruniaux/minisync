@@ -1,0 +1,4 @@
+let node f () =
+  let x = true
+  and x = true
+  in x

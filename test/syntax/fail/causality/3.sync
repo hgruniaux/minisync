@@ -1,0 +1,3 @@
+let node f x = o where
+  rec o = x + y
+  and y = o + 2

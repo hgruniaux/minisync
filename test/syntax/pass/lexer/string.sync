@@ -1,0 +1,8 @@
+let f x =
+  let a = "" in
+  let b = "foo  " in
+  let c = "\n\r\t\b\ \"\'\\" in
+  let e = "\xff\x0a\xA9" in
+  let f = "\169" in
+  let g = "\o123" in
+  x

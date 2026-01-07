@@ -1,0 +1,5 @@
+File "dummy.sync", line 1, characters 10-11:
+ 1 | let node f = 4
+              ^
+
+Error: Node 'f' must have at least one parameter.

@@ -1,0 +1,2 @@
+[@deprecated(5)]
+let f x = x

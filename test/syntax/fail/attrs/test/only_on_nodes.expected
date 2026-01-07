@@ -1,0 +1,5 @@
+File "dummy.sync", line 1, characters 3-7:
+ 1 | [@test]
+       ^^^^
+
+Error: The 'test' attribute can only be applied to nodes.

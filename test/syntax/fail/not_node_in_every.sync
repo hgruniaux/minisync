@@ -1,0 +1,4 @@
+let g x = x
+
+let node f =
+  g 5 every true

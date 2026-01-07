@@ -1,0 +1,4 @@
+let node g x = true
+
+let f =
+  (g x) every true

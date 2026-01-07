@@ -1,0 +1,2 @@
+let node f x = x
+let y = f true

@@ -1,0 +1,6 @@
+let node g z = o where
+  o = z + 1
+
+let node f x = y where
+  rec y = g z
+  and z = y

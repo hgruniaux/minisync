@@ -1,0 +1,4 @@
+type a = c
+and b = int
+and c = b * d
+and d = b * bool

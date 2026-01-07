@@ -1,0 +1,9 @@
+let f x =
+  let a = 5 in
+  let b = 4.5 in
+  let c = true in
+  let d = false in
+  let e = () in
+  let f = "abc" in
+  let g = 'a' in
+  x

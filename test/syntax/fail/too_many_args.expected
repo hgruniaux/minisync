@@ -1,0 +1,5 @@
+File "dummy.sync", line 3, characters 16-17:
+ 3 | let node g x = f x 0
+                    ^
+
+Error: Too many arguments; expected 1, but got 2.

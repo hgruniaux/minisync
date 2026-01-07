@@ -1,0 +1,4 @@
+let node triple_ok a b = (u,v,w) where
+  rec u = 0 fby (v + 1)
+  and v = 0 fby (w + 1)
+  and w = 0 fby (u + 1)

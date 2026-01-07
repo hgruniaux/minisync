@@ -1,0 +1,7 @@
+type state =
+  | S0
+  | S1
+  | S2
+
+let f (s : state) =
+  merge s (S0 -> 0) (S1 -> true) (S2 -> 2)

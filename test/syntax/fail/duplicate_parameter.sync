@@ -1,0 +1,1 @@
+let node f (x : int) (x : int) = x

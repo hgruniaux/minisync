@@ -1,0 +1,5 @@
+File "dummy.sync", line 1, character 13:
+ 1 | let f x = ''
+                 ^
+
+Error: Character literal cannot be empty.

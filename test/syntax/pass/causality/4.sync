@@ -1,0 +1,2 @@
+let node switcher x = y where
+  rec y = if x then 0 else (1 -> pre y)

@@ -1,0 +1,5 @@
+File "dummy.sync", line 1, character 16:
+ 1 | let f x = 'foo'
+                    ^
+
+Error: Character literal must be a single character.

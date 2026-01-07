@@ -1,0 +1,12 @@
+let node f (s : bool) =
+  if s then 0
+  else 1
+
+(* Custom bool-like type *)
+type mybool =
+  | MyFalse
+  | MyTrue
+
+let node g (s : mybool) =
+  if s then 0
+  else 1

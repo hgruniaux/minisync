@@ -1,0 +1,7 @@
+let f1 () = true
+let f2 x () = x
+let f3 () x = x
+
+let node f4 () = true
+let node f5 x () = x
+let node f6 () x = x

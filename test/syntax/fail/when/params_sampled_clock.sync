@@ -1,0 +1,3 @@
+
+let node f x y =
+  merge true (true -> y) (false -> y + 1)

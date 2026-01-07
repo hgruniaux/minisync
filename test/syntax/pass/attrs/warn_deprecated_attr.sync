@@ -1,0 +1,7 @@
+[@deprecated]
+let f x = x
+
+[@deprecated("sorry :(")]
+let g x = x
+
+let test x = f true && g false

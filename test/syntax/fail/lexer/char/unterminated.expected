@@ -1,0 +1,5 @@
+File "dummy.sync", line 1, character 11:
+ 1 | let x = '
+               ^
+
+Error: Unterminated character literal.

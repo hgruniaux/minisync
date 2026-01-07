@@ -1,0 +1,4 @@
+let node g (s : int) = s
+
+let node f (s : int) =
+  g 3 every s

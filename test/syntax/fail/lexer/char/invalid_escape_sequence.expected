@@ -1,0 +1,5 @@
+File "dummy.sync", line 1, character 14:
+ 1 | let f x = '\p'
+                  ^
+
+Error: Invalid escape sequence.

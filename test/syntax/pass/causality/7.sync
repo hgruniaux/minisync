@@ -1,0 +1,2 @@
+let node delayed_cond x = y where
+  rec y = if x > 0 then (0 fby y) else 0

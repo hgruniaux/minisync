@@ -1,0 +1,2 @@
+[@deprecated("test", "test")]
+let f x = x

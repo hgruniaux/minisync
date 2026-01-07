@@ -1,0 +1,5 @@
+File "dummy.sync", line 1, characters 3-10:
+ 1 | [@unknown]
+       ^^^^^^^
+
+Warning: Unknown function attribute 'unknown'.

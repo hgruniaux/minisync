@@ -1,0 +1,5 @@
+let node g x = x
+
+let node f x y =
+  let z = y when x in
+  merge x (true -> g z) (false -> 0)

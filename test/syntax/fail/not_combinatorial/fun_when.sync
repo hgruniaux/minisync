@@ -1,0 +1,2 @@
+type state = S0
+let f x = true when S0(x)

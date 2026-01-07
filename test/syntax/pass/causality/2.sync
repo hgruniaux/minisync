@@ -1,0 +1,3 @@
+let node mutual1 a = (u,v) where
+  rec u = 1 fby (v + 1)
+  and v = 2 fby (u + 1)

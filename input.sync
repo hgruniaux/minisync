@@ -1,0 +1,12 @@
+let node count (i:int) = o
+  where o = (0 fby o) + i
+
+let f x = x * 10
+
+let node condact (c:bool) (i:int) = o
+  where o =
+    merge c
+      (true -> (count ((f i) when c)))
+      (false -> (0 fby o) when not c)
+
+

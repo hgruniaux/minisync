@@ -1,0 +1,6 @@
+type s = | S0 | S1
+
+let node f x a b =
+  let c = (a when S0(b)) + (a when S1(b)) in
+  true
+
