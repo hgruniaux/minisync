@@ -1,0 +1,7 @@
+Autocomplete suggestions:
+ - unit
+ - string
+ - int
+ - float
+ - char
+ - bool

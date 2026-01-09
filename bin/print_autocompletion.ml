@@ -26,20 +26,30 @@
  * For more information, please refer to <https://unlicense.org/>
  *)
 
-include Typechecker_common
-open Typechecker_decl
+open Minisync
+open Format
+open Autocompleter
 
-(** [check_program ctx ast] checks the provided parsed program [ast] within the
-    given context [ctx] and produces a typed program, raises an error in case of
-    ill-typed program. The typechecking context is updated during the process to
-    include new toplevel declarations. *)
-let check_program (ctx : context) (program : Ast.program) : Tast.program =
-  let program =
-    List.filter_map
-      (fun decl ->
-        let tdecl = check_declaration ctx decl in
-        tdecl)
-      program
-  in
-  Autocompleter.finish_autocompletation ();
-  program
+let print_item_kind fmt = function
+  | ACitem_type -> fprintf fmt "type"
+  | ACitem_function -> fprintf fmt "function"
+  | ACitem_variable -> fprintf fmt "variable"
+  | ACitem_constructor -> fprintf fmt "constructor"
+  | ACitem_enum -> fprintf fmt "enum"
+  | ACitem_struct -> fprintf fmt "struct"
+  | ACitem_field -> fprintf fmt "field"
+
+let print_item_location fmt loc =
+  let open Lexing in
+  let start_pos, end_pos = loc in
+  let start_line, end_line = (start_pos.pos_lnum, end_pos.pos_lnum) in
+  let start_col = start_pos.pos_cnum - start_pos.pos_bol in
+  let end_col = end_pos.pos_cnum - end_pos.pos_bol in
+  if start_line = end_line then
+    fprintf fmt "<%d:%d-%d>" start_line start_col end_col
+  else fprintf fmt "<%d:%d-%d:%d>" start_line start_col end_line end_col
+
+let print_suggestions suggestions =
+  let fmt = Format.std_formatter in
+  fprintf fmt "Autocomplete suggestions:\n";
+  List.iter (fun item -> fprintf fmt " - %s\n" item.ac_item_label) suggestions

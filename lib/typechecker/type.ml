@@ -151,7 +151,7 @@ type unification_error =
 
 exception UnificationError of unification_error
 
-let rec unify (t1 : ttype) (t2 : ttype) : unit =
+let rec unify ?(read_only = false) (t1 : ttype) (t2 : ttype) : unit =
   let t1 = prune t1 and t2 = prune t2 in
   match (t1, t2) with
   (* everyting unify with bottom *)
@@ -161,17 +161,21 @@ let rec unify (t1 : ttype) (t2 : ttype) : unit =
   | Ttype_var v1, Ttype_var v2 when v1.ttype_var_id = v2.ttype_var_id -> ()
   | Ttype_var v1, _ ->
       if occurs v1 t2 then raise (UnificationError (OccursCheck (v1, t2)));
-      update_levels t2 v1.ttype_var_level;
-      v1.ttype_var_def <- Some t2
+      if not read_only then begin
+        update_levels t2 v1.ttype_var_level;
+        v1.ttype_var_def <- Some t2
+      end
   | _, Ttype_var v2 ->
       if occurs v2 t1 then raise (UnificationError (OccursCheck (v2, t1)));
-      update_levels t1 v2.ttype_var_level;
-      v2.ttype_var_def <- Some t1
+      if not read_only then begin
+        update_levels t1 v2.ttype_var_level;
+        v2.ttype_var_def <- Some t1
+      end
   (* ignore parentheses and name metadata *)
-  | Ttype_named (_, t1), _ -> unify t1 t2
-  | _, Ttype_named (_, t2) -> unify t1 t2
-  | Ttype_paren t1, _ -> unify t1 t2
-  | _, Ttype_paren t2 -> unify t1 t2
+  | Ttype_named (_, t1), _ -> unify ~read_only t1 t2
+  | _, Ttype_named (_, t2) -> unify ~read_only t1 t2
+  | Ttype_paren t1, _ -> unify ~read_only t1 t2
+  | _, Ttype_paren t2 -> unify ~read_only t1 t2
   | Ttype_int, Ttype_int -> ()
   | Ttype_float, Ttype_float -> ()
   | Ttype_string, Ttype_string -> ()
@@ -181,8 +185,8 @@ let rec unify (t1 : ttype) (t2 : ttype) : unit =
   | Ttype_function (params1, ret1), Ttype_function (params2, ret2)
   | Ttype_node (params1, ret1), Ttype_node (params2, ret2) -> (
       try
-        List.iter2 unify params1 params2;
-        unify ret1 ret2
+        List.iter2 (unify ~read_only) params1 params2;
+        unify ~read_only ret1 ret2
       with Invalid_argument _ ->
         let len1 = List.length params1 in
         let len2 = List.length params2 in
@@ -192,7 +196,7 @@ let rec unify (t1 : ttype) (t2 : ttype) : unit =
           raise (UnificationError (TooManyArguments (t1, len1, len2)))
         else assert false)
   | Ttype_tuple types1, Ttype_tuple types2 -> (
-      try List.iter2 unify types1 types2
+      try List.iter2 (unify ~read_only) types1 types2
       with Invalid_argument _ -> raise (UnificationError (Mismatch (t1, t2))))
   | _ -> raise (UnificationError (Mismatch (t1, t2)))
 

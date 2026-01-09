@@ -46,6 +46,12 @@
 %token<string> STRING_LITERAL
 %token<char> CHAR_LITERAL
 
+%token AUTOCOMPLETE
+%token<string * string> AUTOCOMPLETE_LIDENTIFIER
+%token<string * string> AUTOCOMPLETE_UIDENTIFIER
+
+%token COMMENT
+
 (* Keywords *)
 %token AND "and"
 %token AUTOMATON "automaton"
@@ -58,12 +64,10 @@
 %token EVERY "every"
 %token EXCEPTION "exception"
 %token FBY "fby"
-%token FLOAT "float"
 %token FUN "fun"
 %token IF "if"
 %token IN "in"
 %token INCLUDE "include"
-%token INT "int"
 %token LAST "last"
 %token LET "let"
 %token LOGAND "logand"
@@ -140,8 +144,8 @@ program:
  * -------------------------------------------------------- *)
 
 atomic_type:
-  | "int" { mk_type Atype_int $sloc }
-  | "float" { mk_type Atype_float $sloc }
+  | AUTOCOMPLETE_LIDENTIFIER { let (prefix, suffix) = $1 in mk_type (Atype_autocomplete (Some prefix, Some suffix)) $sloc }
+  | AUTOCOMPLETE { mk_type (Atype_autocomplete (None, None)) $sloc }
   | id=lidentifier { mk_type (Atype_name id) $sloc }
   | "(" t=type_name ")" { mk_type (Atype_paren t) $sloc }
 
@@ -253,6 +257,12 @@ type_enum_definition:
  * -------------------------------------------------------- *)
 
 primary_expression:
+  | AUTOCOMPLETE { mk_expr (Aexpr_autocomplete (None, None)) $sloc }
+  | AUTOCOMPLETE_LIDENTIFIER | AUTOCOMPLETE_UIDENTIFIER
+      {
+        let (prefix, suffix) = $1 in
+        mk_expr (Aexpr_autocomplete (Some prefix, Some suffix)) $sloc
+      }
   | i=INTEGER_LITERAL { mk_expr (Aexpr_int i) $sloc }
   | f=FLOAT_LITERAL { mk_expr (Aexpr_float f) $sloc }
   | s=STRING_LITERAL { mk_expr (Aexpr_string s) $sloc }

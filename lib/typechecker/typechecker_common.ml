@@ -36,6 +36,7 @@ exception Error of string * Location.t * (string * Location.t) list
     flag is used to track that. *)
 let had_error = ref false
 
+let in_autocomplete_mode = ref false
 let error msg pos = raise (Error (msg, pos, []))
 
 let error_with_note ?(ignore_note_if_dummy = false) msg pos note_msg note_pos =
@@ -101,7 +102,9 @@ let create_context () : context =
         |> add Type.bool_declaration.tdecl_enum_name.value
              (Ttype_enum Type.bool_declaration)
         |> add Type.unit_declaration.tdecl_enum_name.value
-             (Ttype_enum Type.unit_declaration));
+             (Ttype_enum Type.unit_declaration)
+        |> add "int" Ttype_int |> add "float" Ttype_float
+        |> add "string" Ttype_string |> add "char" Ttype_char);
     ctx_current_level = 0;
   }
 

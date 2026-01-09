@@ -16,6 +16,9 @@ input: build
 	dune exec ./bin/main.exe -- input.sync $(OPTS) > input.ml
 	ocamlc -i input.ml
 
+autocomplete: build
+	dune exec ./bin/main.exe -- input.sync --autocomplete 4:19 $(OPTS)
+
 test:
 	./test/runner.sh --skip-passed
 

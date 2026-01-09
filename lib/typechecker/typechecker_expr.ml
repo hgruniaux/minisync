@@ -29,9 +29,7 @@
 open Ast
 open Tast
 open Typechecker_common
-
-let mk_texpr texpr_kind texpr_type texpr_clock texpr_loc =
-  { texpr_kind; texpr_type; texpr_clock; texpr_loc }
+open Tast_utils
 
 (** Lookup a constructor declaration by its identifier in the given context. If
     it doesn't find the identifier in the context or if it doesn't refer to a
@@ -69,7 +67,7 @@ let lookup_constructor ctx id =
     the second as true. *)
 let expect_boolean_expr _ctx texpr =
   (* We ignore parens for better locations in error messages. *)
-  let texpr = Tast_utils.ignore_parens texpr in
+  let texpr = ignore_parens texpr in
   match Type.prune texpr.texpr_type with
   | Ttype_var _ ->
       (* Type variable not yet unified, force unification with bool! *)
@@ -115,8 +113,8 @@ let expect_enum_expr texpr =
 (** Try to unify the types of two expressions. If unification fails, emit an
     error. *)
 let unify_types_in_expressions texpr1 texpr2 =
-  let texpr1 = Tast_utils.ignore_parens texpr1 in
-  let texpr2 = Tast_utils.ignore_parens texpr2 in
+  let texpr1 = ignore_parens texpr1 in
+  let texpr2 = ignore_parens texpr2 in
   try Type.unify texpr1.texpr_type texpr2.texpr_type
   with Type.UnificationError reason -> (
     (* Unification failed, try to provide the best error message possible. *)
@@ -165,8 +163,8 @@ let unify_types_in_expressions texpr1 texpr2 =
 (** Try to unify the clocks of two expressions. If unification fails, emit an
     error. *)
 let unify_clocks_in_expressions texpr1 texpr2 =
-  let texpr1 = Tast_utils.ignore_parens texpr1 in
-  let texpr2 = Tast_utils.ignore_parens texpr2 in
+  let texpr1 = ignore_parens texpr1 in
+  let texpr2 = ignore_parens texpr2 in
   try Clock.unify texpr1.texpr_clock texpr2.texpr_clock
   with Clock.UnificationError reason -> (
     (* Unification failed, try to provide the best error message possible. *)
@@ -236,8 +234,8 @@ let common_clock clock1 clock2 =
     [unify_clocks_in_expressions]. *)
 let unify_expressions texpr1 texpr2 =
   (* We ignore parens for better locations in error messages. *)
-  let texpr1 = Tast_utils.ignore_parens texpr1 in
-  let texpr2 = Tast_utils.ignore_parens texpr2 in
+  let texpr1 = ignore_parens texpr1 in
+  let texpr2 = ignore_parens texpr2 in
   unify_types_in_expressions texpr1 texpr2;
   unify_clocks_in_expressions texpr1 texpr2
 
@@ -252,7 +250,7 @@ let expect_type texpr expected_type =
 
 (** Expects [texpr] to be a constant expression. If not, emit an error. *)
 let rec expect_constant texpr =
-  match (Tast_utils.ignore_parens texpr).texpr_kind with
+  match (ignore_parens texpr).texpr_kind with
   | Texpr_int _ -> ()
   | Texpr_float _ -> ()
   | Texpr_ref (Tdecl_constructor _) -> ()
@@ -266,6 +264,9 @@ let rec check_expression ctx (main_expr : Ast.expression) =
   try
     let loc = main_expr.loc in
     match main_expr.value with
+    | Aexpr_autocomplete (prefix, suffix) ->
+        assert !in_autocomplete_mode;
+        Autocompleter.autocomplete_expr ctx loc prefix suffix
     | Aexpr_unit -> check_unit_expression loc
     | Aexpr_int value -> check_integer_expression loc value
     | Aexpr_float value -> check_float_expression loc value
@@ -297,7 +298,7 @@ let rec check_expression ctx (main_expr : Ast.expression) =
         check_match_expression ctx loc expr branches
   with Error (msg, loc, notes) ->
     had_error := true;
-    Error.print_error msg loc notes;
+    if not !in_autocomplete_mode then Error.print_error msg loc notes;
     mk_texpr Texpr_error Ttype_bottom Tclock_static main_expr.loc
 
 and check_unit_expression loc =
@@ -360,8 +361,8 @@ and check_variable_expression ctx loc id =
 
       mk_texpr (Texpr_func_ref (func_decl, type_subst)) func_type func_clock loc
   | _ ->
-      let typ = Tast_utils.type_of_decl decl in
-      let clock = Tast_utils.clock_of_decl decl in
+      let typ = type_of_decl decl in
+      let clock = clock_of_decl decl in
       mk_texpr (Texpr_ref decl) typ clock loc
 
 and check_let_expression ctx loc bindings body rec_loc =
@@ -598,12 +599,12 @@ and check_every_expression ctx loc call cond every_loc =
   expect_boolean_expr ctx tcond;
 
   let callee, _ =
-    match (Tast_utils.ignore_parens tcall).texpr_kind with
+    match (ignore_parens tcall).texpr_kind with
     | Texpr_call (callee, args) -> (callee, args)
     | _ -> error "Expected a node call in 'every' expression." tcall.texpr_loc
   in
 
-  let node_declaration = Tast_utils.extract_function_declaration callee in
+  let node_declaration = extract_function_declaration callee in
   (if not node_declaration.tdecl_fun_is_node then
      let msg =
        "Expected a node call in 'every' expression, but got a function."

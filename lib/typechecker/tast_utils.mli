@@ -26,6 +26,9 @@
  * For more information, please refer to <https://unlicense.org/>
  *)
 
+val mk_texpr :
+  Tast.texpression_kind -> Type.t -> Clock.t -> Location.t -> Tast.texpression
+
 val ignore_parens : Tast.texpression -> Tast.texpression
 (** [ignore_parens expr] recursively removes the outer parenthesis of [expr]
     until there is no more. For example, for [Texpr_paren (Texpr_paren (e))], it

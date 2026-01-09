@@ -39,6 +39,9 @@ open Typechecker_common
     all type names are valid and defined in the current context. *)
 let rec check_type ctx (t : Ast.atype) =
   match t.value with
+  | Atype_autocomplete (prefix, suffix) ->
+      assert !in_autocomplete_mode;
+      Autocompleter.autocomplete_type ctx t.loc prefix suffix
   | Atype_int -> Ttype_int
   | Atype_float -> Ttype_float
   | Atype_name id ->

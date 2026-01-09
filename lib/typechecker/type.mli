@@ -52,9 +52,12 @@ val prune : ?keep_parens:bool -> t -> t
 val fresh_var : int -> t
 (** [fresh_var level] creates a fresh type variable with the given [level]. *)
 
-val unify : t -> t -> unit
+val unify : ?read_only:bool -> t -> t -> unit
 (** [unify t1 t2] unifies the two types [t1] and [t2], making them equal. Raises
-    [UnificationError] if the types cannot be unified. *)
+    [UnificationError] if the types cannot be unified.
+
+    If [read_only] is true, the types are checked for unification without
+    modifying them. *)
 
 val instantiate : int -> t -> t * (ttype_var, t) Hashtbl.t
 (** [instantiate level typ] instantiates all type variables in [typ] that have a

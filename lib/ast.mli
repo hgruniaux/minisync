@@ -37,6 +37,10 @@ type 'a with_location = { value : 'a; loc : Location.t }
 type identifier = string with_location
 
 type atype_kind =
+  | Atype_autocomplete of string option * string option
+      (** [Atype_autocomplete (prefix, suffix)] represents an autocomplete
+          placeholder for types. If [prefix] is [Some s], it indicates that the
+          user has already typed the prefix [s]. Same for [suffix]. *)
   | Atype_int
   | Atype_float
   | Atype_name of identifier
@@ -83,6 +87,10 @@ type unop_kind = Aunop_neg | Aunop_fneg | Aunop_not | Aunop_pre | Aunop_last
 and unop = unop_kind with_location
 
 type expression_kind =
+  | Aexpr_autocomplete of string option * string option
+      (** [Aexpr_autocomplete (prefix, suffix)] represents an autocomplete
+          placeholder for expressions. If [prefix] is [Some s], it indicates
+          that the user has already typed the prefix [s]. Same for [suffix]. *)
   | Aexpr_unit  (** [Aexpr_unit] represents the unit literal '()'. *)
   | Aexpr_int of Z.t
       (** [Aexpr_int n] represents an integer literal with value [n]. *)

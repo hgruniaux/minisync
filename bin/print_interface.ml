@@ -31,24 +31,29 @@ open Tast
 open Format
 open Printer_utils
 
-let print_decl_interface fmt = function
-  | Tdecl_let _ | Tdecl_param _ | Tdecl_constructor _ -> ()
-  | Tdecl_global decl ->
-      let name = decl.tdecl_global_name.value in
-      fprintf fmt "@[%a %a : @[<hov>%a@]@]@," pp_keyword "val"
-        (pp_string_with_color Variable)
-        name Tast_printer.pp_type decl.tdecl_global_value.texpr_type;
-      fprintf fmt "@[%a %a :: @[<hov>%a@]@]" pp_keyword "val"
-        (pp_string_with_color Variable)
-        name Tast_printer.pp_clock decl.tdecl_global_value.texpr_clock
-  | Tdecl_function decl ->
-      let name = decl.tdecl_fun_name.value in
-      fprintf fmt "@[%a %a : @[<hov>%a@]@]@," pp_keyword "val"
-        (pp_string_with_color Function)
-        name Tast_printer.pp_type decl.tdecl_fun_type;
-      fprintf fmt "@[%a %a :: @[<hov>%a@]@]" pp_keyword "val"
-        (pp_string_with_color Function)
-        name Tast_printer.pp_clock decl.tdecl_fun_clock
+let print_decl_interface fmt d =
+  let aux = function
+    | Tdecl_let _ | Tdecl_param _ | Tdecl_constructor _ -> ()
+    | Tdecl_global decl ->
+        let name = decl.tdecl_global_name.value in
+        fprintf fmt "@[%a %a : @[<hov>%a@]@]@," pp_keyword "val"
+          (pp_string_with_color Variable)
+          name Tast_printer.pp_type decl.tdecl_global_value.texpr_type;
+        fprintf fmt "@[%a %a :: @[<hov>%a@]@]" pp_keyword "val"
+          (pp_string_with_color Variable)
+          name Tast_printer.pp_clock decl.tdecl_global_value.texpr_clock
+    | Tdecl_function decl ->
+        let name = decl.tdecl_fun_name.value in
+        fprintf fmt "@[%a %a : @[<hov>%a@]@]@," pp_keyword "val"
+          (pp_string_with_color Function)
+          name Tast_printer.pp_type decl.tdecl_fun_type;
+        fprintf fmt "@[%a %a :: @[<hov>%a@]@]" pp_keyword "val"
+          (pp_string_with_color Function)
+          name Tast_printer.pp_clock decl.tdecl_fun_clock
+  in
+  Tast_printer.enter_type_var_context ();
+  aux d;
+  Tast_printer.exit_type_var_context ()
 
 let print_interface tast =
   let fmt = std_formatter in

@@ -106,6 +106,56 @@ for file in test/syntax/pass/**/*.sync; do
   run_test "$file" 0
 done
 
+run_autocomplete_test () {
+  # Find the position of the AUTOCOMPLETE marker <|>
+  local file="$1"
+
+  # Use awk to find the line (NR) and 1-based column index of the "<|>" marker.
+  # "read" assigns the output to the two variables.
+  read line_number col_number <<< $(awk '{ idx = index($0, "<|>"); if (idx > 0) { print NR, idx; exit } }' "$file")
+
+  if [ -z "$line_number" ]; then
+    echo "No AUTOCOMPLETE marker found in $file"
+    fatal "$file"
+    return
+  fi
+
+  # Create a temporary file, removing the <|> marker
+  local temp_file=$(mktemp --suffix=.sync)
+  sed 's/<|>//' "$file" > "$temp_file"
+
+  OUTPUT_FILE=$(mktemp)
+  # Pass the calculated line and column to the compiler
+  $MINISYNC --color=never --autocomplete="$line_number:$col_number" "$temp_file" > "$OUTPUT_FILE" 2>&1
+  local exit_code=$?
+
+  # Check against an .expected file (similar to run_test logic)
+  local expected_file="${file%.sync}.expected"
+  if [ -f "$expected_file" ]; then
+    if diff -q "$OUTPUT_FILE" "$expected_file" >/dev/null; then
+      pass "$file"
+    else
+      if [ "$UPDATE_EXPECTED" -eq 1 ]; then
+        cp "$OUTPUT_FILE" "$expected_file"
+        echo -e "[\x1b[33mUPDATED\x1b[0m] $expected_file."
+        PASSED_TESTS=$((PASSED_TESTS + 1))
+        TOTAL_TESTS=$((TOTAL_TESTS + 1))
+      else
+        fail "$file (output mismatch)"
+        diff "$expected_file" "$OUTPUT_FILE"
+      fi
+    fi
+  else
+    fatal "$file (no expected file found)"
+  fi
+
+  rm "$OUTPUT_FILE" "$temp_file"
+}
+
+for file in test/autocomplete/**/*.sync; do
+  run_autocomplete_test "$file"
+done
+
 # Print tests summary.
 echo -e "In total, $TOTAL_TESTS were run, out of which:"
 echo -e "  \x1b[32m$PASSED_TESTS\x1b[0m ($((PASSED_TESTS * 100 / TOTAL_TESTS))%) passed,"

@@ -28,26 +28,20 @@
 
 open Tast
 
-(** [ignore_parens expr] recursively removes the outer parenthesis of [expr]
-    until there is no more. For example, for [Texpr_paren (Texpr_paren (e))], it
-    returns [e]. *)
+let mk_texpr texpr_kind texpr_type texpr_clock texpr_loc =
+  { texpr_kind; texpr_type; texpr_clock; texpr_loc }
+
 let rec ignore_parens texpr =
   match texpr.texpr_kind with
   | Texpr_paren inner -> ignore_parens inner
   | _ -> texpr
 
-(** [extract_function_declaration expr] extracts the function declaration from
-    the expression [expr] (ignore parenthesis). It fails if [expr] is not a
-    function reference. *)
 let extract_function_declaration texpr =
   match (ignore_parens texpr).texpr_kind with
   | Texpr_func_ref (func_decl, _) -> func_decl
   | Texpr_ref (Tdecl_function func_decl) -> func_decl
   | _ -> failwith "Expected a function declaration reference."
 
-(** [extract_function_call expr] extracts the function declaration and the list
-    of arguments from the expression [expr] (ignore parenthesis). It fails if
-    [expr] is not a function call. *)
 let extract_function_call texpr =
   match (ignore_parens texpr).texpr_kind with
   | Texpr_call (func_expr, args) -> (
@@ -57,8 +51,6 @@ let extract_function_call texpr =
       | _ -> failwith "Expected a function declaration reference.")
   | _ -> failwith "Expected a function call."
 
-(** [location_of_decl decl] returns the location of the declaration [decl]'s
-    name. *)
 let location_of_decl = function
   | Tdecl_let let_decl -> let_decl.tdecl_let_name.loc
   | Tdecl_param param_decl -> param_decl.tdecl_param_name.loc
@@ -66,7 +58,6 @@ let location_of_decl = function
   | Tdecl_function func_decl -> func_decl.tdecl_fun_name.loc
   | Tdecl_constructor ctor_decl -> ctor_decl.tdecl_constructor_name.loc
 
-(** [type_of_decl decl] returns the type of the declaration [decl]. *)
 let type_of_decl = function
   | Tdecl_let let_decl -> let_decl.tdecl_let_type
   | Tdecl_param param_decl -> param_decl.tdecl_param_type
@@ -81,7 +72,6 @@ let clock_of_decl = function
   | Tdecl_function func_decl -> func_decl.tdecl_fun_clock
   | Tdecl_constructor _ctor_decl -> Tclock_static
 
-(** [name_of_decl decl] returns the name of the declaration [decl]. *)
 let name_of_decl = function
   | Tdecl_let let_decl -> let_decl.tdecl_let_name.value
   | Tdecl_param param_decl -> param_decl.tdecl_param_name.value

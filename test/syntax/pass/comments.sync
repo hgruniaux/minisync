@@ -1,0 +1,8 @@
+(* A block comment *)
+(*  A (* nested (* comment *) oh *) nice! *)
+
+(* A block
+ comment
+ can span multiple
+ lines
+*)

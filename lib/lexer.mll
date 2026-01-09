@@ -62,12 +62,10 @@
           ("every", EVERY);
           ("exception", EXCEPTION);
           ("fby", FBY);
-          ("float", FLOAT);
           ("fun", FUN);
           ("if", IF);
           ("in", IN);
           ("include", INCLUDE);
-          ("int", INT);
           ("last", LAST);
           ("let", LET);
           ("logand", LOGAND);
@@ -118,11 +116,21 @@ let integer = bin_integer | oct_integer | hex_integer | dec_integer
 let exponent = ('e' | 'E') ('+' | '-')? ['0'-'9']+
 let float = (['0'-'9']+ '.' ['0'-'9']* exponent? | ['0'-'9']+ exponent)
 
-rule next_token = parse
+rule next_token keep_comments = parse
   | eof { EOF }
-  | eol { new_line lexbuf; next_token lexbuf }
-  | whitespace { next_token lexbuf }
-  | "(*" { block_comment 1 lexbuf }
+  | eol { new_line lexbuf; next_token keep_comments lexbuf }
+  | whitespace { next_token keep_comments lexbuf }
+  | "(*" {
+    let start = lexbuf.lex_start_p in
+    block_comment 1 lexbuf;
+    let stop = lexbuf.lex_curr_p in
+    if keep_comments then (
+      lexbuf.lex_start_p <- start;
+      lexbuf.lex_curr_p <- stop;
+      COMMENT)
+    else
+      next_token keep_comments lexbuf
+    }
   | lidentifier as i { resolve_keyword i }
   | uidentifier as i { UIDENTIFIER i }
   | integer as i { (INTEGER_LITERAL (Z.of_string i)) }
@@ -169,7 +177,7 @@ and block_comment depth = parse
   | "(*" { block_comment (depth + 1) lexbuf }
   | "*)"
     {
-      if depth = 1 then next_token lexbuf
+      if depth = 1 then ()
       else block_comment (depth - 1) lexbuf
     }
   | _ { block_comment depth lexbuf }

@@ -34,6 +34,9 @@ type action =
   | Check_only
       (** Parses and typechecks the input program but do not emits anything.
           Just prints errors and warnings. *)
+  | Print_tokens
+      (** Prints the list of tokens produced by the lexer. Stops just after it.
+      *)
   | Print_tast
       (** Parses and typechecks the input program and prints the typed abstract
           syntax tree (TAST). Stops just after it. *)
@@ -54,7 +57,25 @@ type action =
 let colors_supported = Out_channel.isatty stdout || Out_channel.isatty stderr
 let enable_colors = ref colors_supported
 let action = ref Compile
+let autocomplete = ref None
 let usage = "Usage: minisync [options] <filename>"
+
+let parse_autocomplete_location loc =
+  try
+    let line_str, col_str =
+      String.split_on_char ':' loc |> function
+      | [ line; col ] -> (line, col)
+      | _ -> failwith "Invalid format"
+    in
+    let line = int_of_string line_str in
+    let col = int_of_string col_str in
+    (line, col)
+  with Failure _ ->
+    Error.print_error
+      ("Invalid autocomplete location format: " ^ loc
+     ^ ". Expected format is <line>:<column>.")
+      Location.dummy [];
+    exit 1
 
 let spec =
   Arg.align
@@ -65,6 +86,11 @@ let spec =
       ( "--check",
         Arg.Unit (fun _ -> action := Check_only),
         " Only typecheck the input program." );
+      ( "--autocomplete",
+        Arg.String
+          (fun prefix ->
+            autocomplete := Some (parse_autocomplete_location prefix)),
+        " <line>:<column> Perform autocomplete at the given location." );
       ( "--color",
         Arg.Symbol
           ( [ "always"; "never"; "auto" ],
@@ -92,6 +118,9 @@ let spec =
       ( "--warnings-as-errors",
         Arg.Set Error.warnings_as_errors,
         " Treat warnings as errors." );
+      ( "--dump-tokens",
+        Arg.Unit (fun _ -> action := Print_tokens),
+        " Print the list of tokens produced by the lexer." );
       ( "--dump-tast",
         Arg.Unit (fun _ -> action := Print_tast),
         " Print the typed abstract syntax tree (TAST) of the checked program."
@@ -151,10 +180,28 @@ let () =
   let lexbuf = Lexing.from_channel input in
   Lexing.set_filename lexbuf filename;
   try
-    let ast = Parser.program Lexer.next_token lexbuf in
+    let next_token =
+      match !autocomplete with
+      | None -> Lexer.next_token (* do not keep comments: *) false
+      | Some (line, col) ->
+          Typechecker_common.in_autocomplete_mode := true;
+          Autocomplete_lexer.next_token (line, col)
+    in
+
+    if !action = Print_tokens then begin
+      Print_tokens.print_tokens next_token lexbuf;
+      exit 0
+    end;
+
+    let ast = Parser.program next_token lexbuf in
     close_in input;
     let ctx = Typechecker.create_context () in
+
     let tast = Typechecker.check_program ctx ast in
+    if Option.is_some !autocomplete then
+      (* In autocomplete mode, we stop after typechecking. *)
+      exit 0;
+
     if !action = Print_tast then (
       Tast_printer.pp_program Format.std_formatter tast;
       if !Typechecker.had_error then exit 1 else exit 0)
@@ -191,3 +238,7 @@ let () =
   | Typechecker.Error (msg, pos, notes) ->
       close_in input;
       handle_error ~notes msg pos
+  | Autocompleter.Autocomplete suggestions ->
+      close_in input;
+      Print_autocompletion.print_suggestions suggestions;
+      exit 0
